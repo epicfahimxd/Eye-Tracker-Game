@@ -55,18 +55,22 @@ const EyeTracker = (() => {
       throw new Error('WebGazer library not loaded');
     }
 
-    /* hide WebGazer's built-in dot — we have our own cursor */
+    /* hide WebGazer's built-in dot — we draw our own cursor */
     webgazer.showPredictionPoints(false);
 
-    await webgazer
-      .setRegression('ridge')
-      .setTracker('TFFacemesh')
-      .begin();
+    /* Set up regression + tracker before begin() */
+    webgazer.setRegression('ridge');
 
+    /* TFFacemesh is WebGazer 3.x; fall back gracefully if not available */
+    try { webgazer.setTracker('TFFacemesh'); } catch (_) {}
+
+    await webgazer.begin();
+
+    /* Attach gaze listener after begin() resolves */
     webgazer.setGazeListener(onGazeData);
 
-    /* Position the webcam preview */
-    setTimeout(styleWebcamPreview, 500);
+    /* Position the webcam preview in the corner */
+    setTimeout(styleWebcamPreview, 800);
 
     ready = true;
   }

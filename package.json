@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Where's Waldo game with eye tracking via webcam",
   "scripts": {
-    "start": "npx http-server . -p 3000 --cors -c-1 -o",
-    "python": "python3 -m http.server 3000"
+    "start": "python3 -m http.server 8080",
+    "serve": "npx http-server . -p 8080 --cors -c-1"
+  },
+  "dependencies": {
+    "webgazer": "^3.5.3"
   }
 }
