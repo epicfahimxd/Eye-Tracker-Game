@@ -13,6 +13,30 @@ window.showScreen = function showScreen(id) {
   if (target) target.classList.add('active');
 };
 
+/* ── Helpers ────────────────────────────────────────────── */
+function tick()        { return new Promise(r => setTimeout(r, 50)); }
+function sleep(ms)     { return new Promise(r => setTimeout(r, ms)); }
+
+function setLoadingStatus(msg) {
+  const el = document.getElementById('loading-status');
+  if (el) el.textContent = msg;
+}
+
+function showEyeTrackerError(err) {
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
+  if (!isSecure) {
+    alert('Camera access requires http://localhost — open the page via the local server, not by double-clicking the file.');
+    return;
+  }
+  alert(
+    'Camera error: ' + (err && err.message ? err.message : err) + '\n\n' +
+    'Try:\n' +
+    '1. Refresh the page and click "Allow" when the browser asks for camera access\n' +
+    '2. Check System Settings → Privacy → Camera and make sure your browser is allowed\n' +
+    '3. Or click "Use Mouse (Demo Mode)" to try the game without eye tracking'
+  );
+}
+
 /* ── Boot ───────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game-canvas');
@@ -20,21 +44,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Welcome screen ─────────────────────────────────────── */
   document.getElementById('btn-start').addEventListener('click', async () => {
-    showScreen('screen-calibration');
+    showScreen('screen-loading');
+    setLoadingStatus('Requesting camera access…');
+
     try {
-      await EyeTracker.init();
+      /* Give the browser a tick to show the loading screen */
+      await tick();
+
+      setLoadingStatus('Loading face detection model…');
+      await EyeTracker.init(setLoadingStatus);
+
+      setLoadingStatus('Eye tracker ready! ✓');
+      await sleep(500);
+
+      showScreen('screen-calibration');
       startCalibration();
     } catch (err) {
       console.error('Eye tracker init failed:', err);
-      alert(
-        'Could not start the eye tracker.\n\n' +
-        'Make sure you:\n' +
-        '• Allow camera access in the browser\n' +
-        '• Are running via http://localhost (not file://)\n\n' +
-        'Tip: run  npm start  in this folder, then open http://localhost:3000'
-      );
       showScreen('screen-welcome');
+      showEyeTrackerError(err);
     }
+  });
+
+  document.getElementById('btn-loading-cancel').addEventListener('click', () => {
+    showScreen('screen-welcome');
   });
 
   document.getElementById('btn-mouse-mode').addEventListener('click', () => {

@@ -49,13 +49,15 @@ const EyeTracker = (() => {
   }
 
   /* ── WebGazer init ──────────────────────────────────────── */
-  async function init() {
+  async function init(onStatus) {
     if (ready || mouseMode) return;
     if (typeof webgazer === 'undefined') {
-      throw new Error('WebGazer library not loaded');
+      throw new Error('WebGazer library not loaded — make sure you opened the page via http://localhost');
     }
 
-    /* hide WebGazer's built-in dot — we draw our own cursor */
+    const status = typeof onStatus === 'function' ? onStatus : () => {};
+
+    /* Hide WebGazer's built-in dot — we draw our own cursor */
     webgazer.showPredictionPoints(false);
 
     /* Set up regression + tracker before begin() */
@@ -64,7 +66,10 @@ const EyeTracker = (() => {
     /* TFFacemesh is WebGazer 3.x; fall back gracefully if not available */
     try { webgazer.setTracker('TFFacemesh'); } catch (_) {}
 
+    status('Initialising face detection…');
     await webgazer.begin();
+
+    status('Attaching gaze listener…');
 
     /* Attach gaze listener after begin() resolves */
     webgazer.setGazeListener(onGazeData);
