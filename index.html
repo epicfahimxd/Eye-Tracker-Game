@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where's Waldo — Eye Tracker Edition</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ═══════════════════ WELCOME SCREEN ═══════════════════ -->
+  <div id="screen-welcome" class="screen active">
+    <div class="welcome-stripes"></div>
+    <div class="welcome-content">
+      <div class="logo">
+        <span class="logo-where">WHERE'S</span>
+        <span class="logo-waldo">WALDO?</span>
+        <span class="logo-sub">👁 Eye Tracker Edition</span>
+      </div>
+      <p class="welcome-desc">
+        Find Waldo in each scene using just your eyes.<br>
+        Your laptop camera tracks your gaze — no clicking needed!
+      </p>
+      <div class="level-cards">
+        <div class="level-card">
+          <div class="lc-icon">🏖️</div>
+          <div class="lc-name">Beach Day</div>
+          <div class="lc-meta"><span class="badge easy">Easy</span><span class="lc-time">60s</span></div>
+        </div>
+        <div class="level-card">
+          <div class="lc-icon">🎡</div>
+          <div class="lc-name">County Fair</div>
+          <div class="lc-meta"><span class="badge medium">Medium</span><span class="lc-time">45s</span></div>
+        </div>
+        <div class="level-card">
+          <div class="lc-icon">🎊</div>
+          <div class="lc-name">City Parade</div>
+          <div class="lc-meta"><span class="badge hard">Hard</span><span class="lc-time">30s</span></div>
+        </div>
+      </div>
+      <div class="how-to">
+        <h3>How to Play</h3>
+        <ol>
+          <li>Allow camera access when prompted</li>
+          <li>Click the 9 calibration dots so the tracker learns your eyes</li>
+          <li>Look around the scene to find Waldo</li>
+          <li>Stare at Waldo for <strong>1.5 seconds</strong> — level complete!</li>
+        </ol>
+      </div>
+      <div class="welcome-buttons">
+        <button id="btn-start" class="btn btn-primary btn-large">🎯 Enable Camera &amp; Play</button>
+        <button id="btn-mouse-mode" class="btn btn-secondary">🖱 Use Mouse (Demo Mode)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ CALIBRATION SCREEN ═══════════════════ -->
+  <div id="screen-calibration" class="screen">
+    <div class="calib-header">
+      <h2>Eye Tracker Calibration</h2>
+      <p>Look at each dot, then <strong>click it</strong>. The more you click, the better the accuracy!</p>
+      <div class="calib-progress-text">
+        <span id="calib-count">0</span>/9 dots calibrated
+      </div>
+    </div>
+    <div id="calib-dots-container"></div>
+    <div class="calib-footer">
+      <button id="btn-skip-calib" class="btn btn-secondary">Skip (less accurate)</button>
+      <button id="btn-done-calib" class="btn btn-primary" style="display:none">Start Game →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ GAME SCREEN ═══════════════════ -->
+  <div id="screen-game" class="screen">
+    <!-- HUD -->
+    <div id="game-hud">
+      <div class="hud-left">
+        <span id="hud-icon">🏖️</span>
+        <span id="hud-name">Beach Day</span>
+        <span id="hud-diff" class="badge easy">Easy</span>
+      </div>
+      <div class="hud-center">
+        <div class="timer-wrap">
+          <div class="timer-bar-bg">
+            <div id="timer-bar" class="timer-bar"></div>
+          </div>
+          <div id="timer-text" class="timer-text">60s</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <span class="hud-find-label">👀 Find Waldo!</span>
+        <button id="btn-hint" class="btn btn-sm">💡 Hint</button>
+      </div>
+    </div>
+
+    <!-- Main canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Gaze cursor overlay -->
+    <div id="gaze-cursor" style="display:none">
+      <svg viewBox="0 0 64 64" width="64" height="64">
+        <circle cx="32" cy="32" r="26" class="gc-outer"/>
+        <circle cx="32" cy="32" r="5"  class="gc-dot"/>
+        <circle cx="32" cy="32" r="26" class="gc-dwell" id="gc-dwell"/>
+      </svg>
+    </div>
+
+    <!-- Flash when Waldo found -->
+    <div id="found-flash" class="found-flash" style="display:none"></div>
+
+    <!-- Hint popup -->
+    <div id="hint-popup" class="hint-popup" style="display:none">
+      <div class="hint-box">
+        🔍 Waldo is hiding in the <strong id="hint-text">right side</strong> of the scene
+        <button id="btn-close-hint" class="hint-close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ LEVEL COMPLETE SCREEN ═══════════════════ -->
+  <div id="screen-level-complete" class="screen overlay-screen">
+    <div id="confetti-a"></div>
+    <div class="result-card">
+      <div class="result-emoji anim-bounce">🎉</div>
+      <h1>You Found Waldo!</h1>
+      <p class="result-sub">Level <span id="lc-level-num">1</span> complete!</p>
+      <div class="result-stats">
+        <div class="rstat">
+          <span class="rstat-label">Time Left</span>
+          <span class="rstat-value" id="lc-time-left">--s</span>
+        </div>
+        <div class="rstat">
+          <span class="rstat-label">Level</span>
+          <span class="rstat-value" id="lc-level-name">Beach Day</span>
+        </div>
+      </div>
+      <button id="btn-next-level" class="btn btn-primary btn-large">Next Level →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ GAME OVER SCREEN ═══════════════════ -->
+  <div id="screen-game-over" class="screen overlay-screen">
+    <div class="result-card">
+      <div class="result-emoji">⏰</div>
+      <h1 class="text-danger">Time's Up!</h1>
+      <p class="result-sub">Waldo escaped... but he can't hide forever!</p>
+      <div class="waldo-hint-card">
+        <p>Waldo was hiding in the <strong id="go-hint-region">right side</strong></p>
+      </div>
+      <div class="result-buttons">
+        <button id="btn-retry" class="btn btn-primary">↺ Try Again</button>
+        <button id="btn-menu" class="btn btn-secondary">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ VICTORY SCREEN ═══════════════════ -->
+  <div id="screen-victory" class="screen overlay-screen">
+    <div id="confetti-b"></div>
+    <div class="result-card">
+      <div class="result-emoji anim-spin">🏆</div>
+      <h1 class="text-gold">Waldo Master!</h1>
+      <p class="result-sub">You found Waldo in all 3 scenes!</p>
+      <div class="result-stats">
+        <div class="rstat">
+          <span class="rstat-label">Levels</span>
+          <span class="rstat-value">3 / 3</span>
+        </div>
+      </div>
+      <button id="btn-play-again" class="btn btn-primary btn-large">🎯 Play Again</button>
+    </div>
+  </div>
+
+  <!-- WebGazer library -->
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+
+  <!-- Game modules (order matters) -->
+  <script src="js/levels.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/eyetracker.js"></script>
+  <script src="js/calibration.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
