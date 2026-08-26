@@ -60,15 +60,10 @@ const EyeTracker = (() => {
     webgazer.showPredictionPoints(false);
 
     /*
-     * Fix the MediaPipe face-mesh asset path.
-     * WebGazer defaults to './mediapipe/face_mesh' which resolves to
-     * http://localhost:8080/mediapipe/face_mesh — the wrong location.
-     * The actual files live inside the npm package at the path below.
+     * WebGazer hardcodes the face-mesh path to './mediapipe/face_mesh'.
+     * We copy those files into /mediapipe/face_mesh/ at the project root
+     * so the browser can find them at http://localhost:8080/mediapipe/face_mesh/
      */
-    if (webgazer.params) {
-      webgazer.params.faceMeshSolutionPath = 'node_modules/webgazer/dist/mediapipe/face_mesh';
-    }
-
     status('Initialising face detection…');
     await webgazer.begin();
 
