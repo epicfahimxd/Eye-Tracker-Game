@@ -10,10 +10,14 @@ const EyeTracker = (() => {
   let active    = false;
   let mouseMode = false;
 
-  let rawX = null, rawY = null;
-  let smX  = null, smY  = null;
+  /* ── Smoothing config ───────────────────────────────────── */
+  const ALPHA        = 0.07;   // EMA factor — very low = very smooth, less reactive
+  const BUF_SIZE     = 12;     // moving-average window (frames)
+  const MAX_JUMP_PX  = 280;    // ignore readings that jump more than this (outliers)
 
-  const ALPHA = 0.28; // lower = smoother but laggier (0.15–0.35 works well)
+  let smX = null, smY = null;
+  const bufX = [], bufY = [];
+
   const listeners = new Set();
 
   /* ── Internal helpers ───────────────────────────────────── */
@@ -22,15 +26,29 @@ const EyeTracker = (() => {
     listeners.forEach(fn => { try { fn(x, y); } catch(e){} });
   }
 
-  function smooth(raw, prev) {
-    return prev === null ? raw : prev + ALPHA * (raw - prev);
+  function bufAvg(buf) {
+    return buf.reduce((s, v) => s + v, 0) / buf.length;
   }
 
   function onGazeData(data) {
     if (!data) return;
-    rawX = data.x; rawY = data.y;
-    smX  = smooth(rawX, smX);
-    smY  = smooth(rawY, smY);
+
+    /* 1. Outlier rejection — discard readings that jump wildly */
+    if (smX !== null) {
+      const dist = Math.hypot(data.x - smX, data.y - smY);
+      if (dist > MAX_JUMP_PX) return;
+    }
+
+    /* 2. Rolling buffer (moving average) */
+    bufX.push(data.x); if (bufX.length > BUF_SIZE) bufX.shift();
+    bufY.push(data.y); if (bufY.length > BUF_SIZE) bufY.shift();
+    const avgX = bufAvg(bufX);
+    const avgY = bufAvg(bufY);
+
+    /* 3. Exponential moving average on top of the buffer average */
+    smX = smX === null ? avgX : smX + ALPHA * (avgX - smX);
+    smY = smY === null ? avgY : smY + ALPHA * (avgY - smY);
+
     emit(smX, smY);
   }
 
@@ -58,6 +76,11 @@ const EyeTracker = (() => {
     const status = typeof onStatus === 'function' ? onStatus : () => {};
 
     webgazer.showPredictionPoints(false);
+
+    /* Enable WebGazer's built-in Kalman filter for extra smoothing */
+    if (typeof webgazer.applyKalmanFilter === 'function') {
+      webgazer.applyKalmanFilter(true);
+    }
 
     /*
      * WebGazer hardcodes the face-mesh path to './mediapipe/face_mesh'.

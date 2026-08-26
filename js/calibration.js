@@ -7,7 +7,7 @@
  */
 const Calibration = (() => {
 
-  const CLICKS_NEEDED = 5;   // clicks per dot for good accuracy
+  const CLICKS_NEEDED = 8;   // clicks per dot — more = better accuracy
 
   /* 9-point grid [fractionX, fractionY]
      Kept well inside the viewport and below the header. */
