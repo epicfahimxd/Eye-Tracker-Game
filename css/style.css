@@ -162,19 +162,26 @@ html, body {
 
 .calib-dot {
   position: absolute;
-  width: 22px; height: 22px; border-radius: 50%;
+  width: 32px; height: 32px; border-radius: 50%;
   background: var(--red); border: 3px solid #fff;
   transform: translate(-50%, -50%); cursor: pointer;
-  box-shadow: 0 0 0 0 rgba(230,48,48,0.5);
-  animation: calib-pulse 1.6s ease-out infinite;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 800; color: #fff;
   transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 0 0 0 rgba(230,48,48,0.5);
 }
-.calib-dot:hover { transform: translate(-50%, -50%) scale(1.25); }
-.calib-dot.done  { background: var(--green); border-color: var(--green); animation: none; }
+.calib-dot-active {
+  animation: calib-pulse 1.4s ease-out infinite;
+}
+.calib-dot:hover { transform: translate(-50%, -50%) scale(1.2); }
+.calib-dot.done  {
+  background: var(--green); border-color: var(--green);
+  animation: none; font-size: 1rem;
+}
 
 @keyframes calib-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(230,48,48,0.5); }
-  70%  { box-shadow: 0 0 0 14px rgba(230,48,48,0); }
+  0%   { box-shadow: 0 0 0 0 rgba(230,48,48,0.55); }
+  70%  { box-shadow: 0 0 0 18px rgba(230,48,48,0); }
   100% { box-shadow: 0 0 0 0 rgba(230,48,48,0); }
 }
 
@@ -282,33 +289,33 @@ html, body {
 }
 .hint-close:hover { color: var(--text); }
 
-/* WebGazer video – default: left side for calibration */
+/* WebGazer video – draggable, starts bottom-left during calibration */
 #webgazerVideoContainer {
   position: fixed !important;
-  bottom: 100px !important;
-  left: 24px !important;
+  bottom: 16px !important;
+  left: 4px !important;
+  top: auto !important;
+  right: auto !important;
   transform: none !important;
-  z-index: 500 !important;
-  width: 240px !important;
-  border-radius: 12px !important;
+  z-index: 600 !important;
+  width: 220px !important;
+  border-radius: 10px !important;
   overflow: hidden !important;
-  border: 2px solid rgba(255,255,255,0.3) !important;
+  border: 2px solid rgba(255,255,255,0.35) !important;
   opacity: 1 !important;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+  cursor: grab !important;
+  user-select: none !important;
 }
-#webgazerVideoFeed { width: 100% !important; }
+#webgazerVideoContainer:active { cursor: grabbing !important; }
+#webgazerVideoFeed { width: 100% !important; display: block !important; }
 #webgazerGazeDot   { display: none !important; }
 
-/* During game: shrink to small corner preview */
+/* During game: shrink slightly but keep wherever user dragged it */
 body.game-active #webgazerVideoContainer {
-  bottom: auto !important;
-  top: calc(var(--hud-h) + 8px) !important;
-  left: auto !important;
-  right: 8px !important;
-  transform: none !important;
-  width: 140px !important;
-  opacity: 0.6 !important;
-  border-color: rgba(255,255,255,0.12) !important;
+  width: 160px !important;
+  opacity: 0.65 !important;
+  border-color: rgba(255,255,255,0.15) !important;
   box-shadow: none !important;
 }
 

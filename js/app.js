@@ -55,6 +55,42 @@ function resetLoadingScreen() {
   setLoadingStatus('Loading face detection model…');
 }
 
+/* ── Make WebGazer video draggable ──────────────────────── */
+function makeDraggable(el) {
+  let dragging = false, startX, startY, origLeft, origTop;
+
+  el.addEventListener('mousedown', e => {
+    dragging = true;
+    startX   = e.clientX;
+    startY   = e.clientY;
+    const rect = el.getBoundingClientRect();
+    origLeft = rect.left;
+    origTop  = rect.top;
+    el.style.bottom = 'auto';
+    el.style.right  = 'auto';
+    el.style.left   = origLeft + 'px';
+    el.style.top    = origTop  + 'px';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    el.style.left = Math.max(0, origLeft + dx) + 'px';
+    el.style.top  = Math.max(0, origTop  + dy) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => { dragging = false; });
+}
+
+/* Attach drag once WebGazer creates the container */
+function waitForWebcamAndMakeDraggable() {
+  const el = document.getElementById('webgazerVideoContainer');
+  if (el) { makeDraggable(el); return; }
+  setTimeout(waitForWebcamAndMakeDraggable, 300);
+}
+
 /* ── Boot ───────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game-canvas');
@@ -80,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await sleep(600);
       showScreen('screen-calibration');
       startCalibration();
+      waitForWebcamAndMakeDraggable();
     } catch (err) {
       showEyeTrackerError(err); /* stays on loading screen, shows error state */
     }
