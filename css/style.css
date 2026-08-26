@@ -298,26 +298,63 @@ html, body {
   right: auto !important;
   transform: none !important;
   z-index: 600 !important;
-  width: 220px !important;
+  width: 230px !important;
   border-radius: 10px !important;
-  overflow: hidden !important;
+  overflow: visible !important;  /* allow handle shadow to show */
   border: 2px solid rgba(255,255,255,0.35) !important;
   opacity: 1 !important;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-  cursor: grab !important;
   user-select: none !important;
 }
-#webgazerVideoContainer:active { cursor: grabbing !important; }
-#webgazerVideoFeed { width: 100% !important; display: block !important; }
-#webgazerGazeDot   { display: none !important; }
+#webgazerVideoFeed {
+  width: 100% !important;
+  display: block !important;
+  border-radius: 0 0 8px 8px !important;
+}
+#webgazerGazeDot { display: none !important; }
 
-/* During game: shrink slightly but keep wherever user dragged it */
+/* Drag handle bar */
+#webcam-drag-handle {
+  position: relative;
+  width: 100%;
+  height: 26px;
+  background: rgba(30,30,40,0.92);
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  z-index: 10;
+  flex-shrink: 0;
+}
+#webcam-drag-handle:active { cursor: grabbing; }
+#webcam-drag-handle span {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+/* Face centering oval guide */
+#face-guide {
+  position: absolute;
+  top: 36px; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 130px;
+  border: 2px dashed rgba(255,255,255,0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* During game: shrink but keep wherever user dragged it */
 body.game-active #webgazerVideoContainer {
   width: 160px !important;
-  opacity: 0.65 !important;
-  border-color: rgba(255,255,255,0.15) !important;
+  opacity: 0.6 !important;
+  border-color: rgba(255,255,255,0.12) !important;
   box-shadow: none !important;
 }
+body.game-active #face-guide { display: none; }
 
 
 /* ══════════════════════════════════════════════════════════════

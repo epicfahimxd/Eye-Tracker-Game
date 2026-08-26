@@ -55,39 +55,52 @@ function resetLoadingScreen() {
   setLoadingStatus('Loading face detection model…');
 }
 
-/* ── Make WebGazer video draggable ──────────────────────── */
-function makeDraggable(el) {
-  let dragging = false, startX, startY, origLeft, origTop;
+/* ── Draggable webcam preview ───────────────────────────── */
+function setupDraggableWebcam(container) {
+  /* Inject a grab-handle bar at the top of the WebGazer container */
+  const handle = document.createElement('div');
+  handle.id = 'webcam-drag-handle';
+  handle.innerHTML = '<span>&#8942;&#8942; drag</span>';
+  container.appendChild(handle);
 
-  el.addEventListener('mousedown', e => {
+  /* Face-centering oval guide */
+  const guide = document.createElement('div');
+  guide.id = 'face-guide';
+  container.appendChild(guide);
+
+  let dragging = false, offX = 0, offY = 0;
+
+  handle.addEventListener('mousedown', e => {
     dragging = true;
-    startX   = e.clientX;
-    startY   = e.clientY;
-    const rect = el.getBoundingClientRect();
-    origLeft = rect.left;
-    origTop  = rect.top;
-    el.style.bottom = 'auto';
-    el.style.right  = 'auto';
-    el.style.left   = origLeft + 'px';
-    el.style.top    = origTop  + 'px';
+    const rect = container.getBoundingClientRect();
+    /* Freeze position so CSS bottom/right don't fight us */
+    container.style.setProperty('bottom', 'auto',  'important');
+    container.style.setProperty('right',  'auto',  'important');
+    container.style.setProperty('left',   rect.left + 'px', 'important');
+    container.style.setProperty('top',    rect.top  + 'px', 'important');
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
     e.preventDefault();
+    e.stopPropagation();
   });
 
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    el.style.left = Math.max(0, origLeft + dx) + 'px';
-    el.style.top  = Math.max(0, origTop  + dy) + 'px';
+    const x = Math.max(0, Math.min(window.innerWidth  - container.offsetWidth,  e.clientX - offX));
+    const y = Math.max(0, Math.min(window.innerHeight - container.offsetHeight, e.clientY - offY));
+    container.style.setProperty('left', x + 'px', 'important');
+    container.style.setProperty('top',  y + 'px', 'important');
   });
 
   document.addEventListener('mouseup', () => { dragging = false; });
 }
 
-/* Attach drag once WebGazer creates the container */
 function waitForWebcamAndMakeDraggable() {
   const el = document.getElementById('webgazerVideoContainer');
-  if (el) { makeDraggable(el); return; }
+  if (el && !document.getElementById('webcam-drag-handle')) {
+    setupDraggableWebcam(el);
+    return;
+  }
   setTimeout(waitForWebcamAndMakeDraggable, 300);
 }
 

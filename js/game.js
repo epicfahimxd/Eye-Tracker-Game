@@ -13,7 +13,7 @@
 const Game = (() => {
 
   /* ── Constants ──────────────────────────────────────────── */
-  const DWELL_MS      = 1500;   // ms gaze must dwell on Waldo
+  const DWELL_MS      = 1000;   // ms gaze must dwell on Waldo
   const HUD_H         = 58;     // px — must match --hud-h CSS var
 
   /* ── State ──────────────────────────────────────────────── */
