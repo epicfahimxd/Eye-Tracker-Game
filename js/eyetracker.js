@@ -57,10 +57,17 @@ const EyeTracker = (() => {
 
     const status = typeof onStatus === 'function' ? onStatus : () => {};
 
-    /* Don't configure regression/tracker before begin() — WebGazer 3.x
-       handles its own setup internally; calling setRegression/setTracker
-       before begin() causes "t is not a function" inside the minified bundle. */
     webgazer.showPredictionPoints(false);
+
+    /*
+     * Fix the MediaPipe face-mesh asset path.
+     * WebGazer defaults to './mediapipe/face_mesh' which resolves to
+     * http://localhost:8080/mediapipe/face_mesh — the wrong location.
+     * The actual files live inside the npm package at the path below.
+     */
+    if (webgazer.params) {
+      webgazer.params.faceMeshSolutionPath = 'node_modules/webgazer/dist/mediapipe/face_mesh';
+    }
 
     status('Initialising face detection…');
     await webgazer.begin();
