@@ -282,20 +282,35 @@ html, body {
 }
 .hint-close:hover { color: var(--text); }
 
-/* WebGazer video – pin to top-right during game */
+/* WebGazer video – default: centered for calibration */
 #webgazerVideoContainer {
   position: fixed !important;
-  top: calc(var(--hud-h) + 8px) !important;
-  right: 8px !important;
+  bottom: 100px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   z-index: 500 !important;
-  width: 150px !important;
-  border-radius: 8px !important;
+  width: 240px !important;
+  border-radius: 12px !important;
   overflow: hidden !important;
-  border: 2px solid rgba(255,255,255,0.15) !important;
-  opacity: 0.7 !important;
+  border: 2px solid rgba(255,255,255,0.3) !important;
+  opacity: 1 !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
 }
 #webgazerVideoFeed { width: 100% !important; }
-#webgazerGazeDot   { display: none !important; } /* use our own cursor */
+#webgazerGazeDot   { display: none !important; }
+
+/* During game: shrink to small corner preview */
+body.game-active #webgazerVideoContainer {
+  bottom: auto !important;
+  top: calc(var(--hud-h) + 8px) !important;
+  left: auto !important;
+  right: 8px !important;
+  transform: none !important;
+  width: 140px !important;
+  opacity: 0.6 !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  box-shadow: none !important;
+}
 
 
 /* ══════════════════════════════════════════════════════════════

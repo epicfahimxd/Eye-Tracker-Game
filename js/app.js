@@ -112,15 +112,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  document.getElementById('btn-done-calib').addEventListener('click', () => {
+  function goToGame() {
+    document.body.classList.add('game-active');
     showScreen('screen-game');
     Game.startLevel(0);
-  });
+  }
 
-  document.getElementById('btn-skip-calib').addEventListener('click', () => {
-    showScreen('screen-game');
-    Game.startLevel(0);
-  });
+  document.getElementById('btn-done-calib').addEventListener('click', goToGame);
+  document.getElementById('btn-skip-calib').addEventListener('click', goToGame);
 
   /* ── Game screen ────────────────────────────────────────── */
   document.getElementById('btn-hint').addEventListener('click', () => Game.showHint());

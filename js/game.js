@@ -208,6 +208,7 @@ const Game = (() => {
     EyeTracker.pause();
     levelIdx = 0;
     document.getElementById('gaze-cursor').style.display = 'none';
+    document.body.classList.remove('game-active');
     setDwellRing(0);
     window.showScreen('screen-welcome');
   }

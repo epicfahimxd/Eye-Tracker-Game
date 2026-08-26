@@ -11,11 +11,13 @@
  */
 const Calibration = (() => {
 
-  /* 9-point grid: [fractionX, fractionY] */
+  /* 9-point grid: [fractionX, fractionY]
+     Top row starts at 0.22 (below the header + some breathing room).
+     Side columns at 0.08 / 0.92 to stay fully inside the viewport. */
   const POINTS = [
-    [0.05, 0.12], [0.50, 0.12], [0.95, 0.12],
-    [0.05, 0.50], [0.50, 0.50], [0.95, 0.50],
-    [0.05, 0.88], [0.50, 0.88], [0.95, 0.88],
+    [0.08, 0.22], [0.50, 0.22], [0.92, 0.22],
+    [0.08, 0.55], [0.50, 0.55], [0.92, 0.55],
+    [0.08, 0.88], [0.50, 0.88], [0.92, 0.88],
   ];
 
   let clicked  = 0;
