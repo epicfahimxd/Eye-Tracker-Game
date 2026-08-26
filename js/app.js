@@ -22,18 +22,36 @@ function setLoadingStatus(msg) {
   if (el) el.textContent = msg;
 }
 
+function isSafari() {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
+
 function showEyeTrackerError(err) {
+  console.error('[EyeTracker] init failed:', err);
+
+  if (isSafari()) {
+    alert(
+      '⚠️ Safari is not supported by WebGazer.\n\n' +
+      'Please open this page in Google Chrome:\n' +
+      'http://localhost:8080\n\n' +
+      '(Or click "Use Mouse (Demo Mode)" to play without eye tracking.)'
+    );
+    return;
+  }
+
   const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
   if (!isSecure) {
     alert('Camera access requires http://localhost — open the page via the local server, not by double-clicking the file.');
     return;
   }
+
   alert(
-    'Camera error: ' + (err && err.message ? err.message : err) + '\n\n' +
+    'Camera error: ' + (err && err.message ? err.message : String(err)) + '\n\n' +
     'Try:\n' +
-    '1. Refresh the page and click "Allow" when the browser asks for camera access\n' +
-    '2. Check System Settings → Privacy → Camera and make sure your browser is allowed\n' +
-    '3. Or click "Use Mouse (Demo Mode)" to try the game without eye tracking'
+    '1. Use Google Chrome (not Safari or Firefox)\n' +
+    '2. Refresh and click "Allow" when the browser asks for camera access\n' +
+    '3. Check System Settings → Privacy & Security → Camera → allow Chrome\n' +
+    '4. Or click "Use Mouse (Demo Mode)" to play without eye tracking'
   );
 }
 
@@ -41,6 +59,12 @@ function showEyeTrackerError(err) {
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game-canvas');
   Game.init(canvas);
+
+  /* Warn Safari users immediately */
+  if (isSafari()) {
+    const w = document.getElementById('browser-warning');
+    if (w) w.style.display = 'block';
+  }
 
   /* ── Welcome screen ─────────────────────────────────────── */
   document.getElementById('btn-start').addEventListener('click', async () => {

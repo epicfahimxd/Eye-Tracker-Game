@@ -57,21 +57,16 @@ const EyeTracker = (() => {
 
     const status = typeof onStatus === 'function' ? onStatus : () => {};
 
-    /* Hide WebGazer's built-in dot — we draw our own cursor */
+    /* Don't configure regression/tracker before begin() — WebGazer 3.x
+       handles its own setup internally; calling setRegression/setTracker
+       before begin() causes "t is not a function" inside the minified bundle. */
     webgazer.showPredictionPoints(false);
-
-    /* Set up regression + tracker before begin() */
-    webgazer.setRegression('ridge');
-
-    /* TFFacemesh is WebGazer 3.x; fall back gracefully if not available */
-    try { webgazer.setTracker('TFFacemesh'); } catch (_) {}
 
     status('Initialising face detection…');
     await webgazer.begin();
 
-    status('Attaching gaze listener…');
-
-    /* Attach gaze listener after begin() resolves */
+    /* Attach listener only after begin() fully resolves */
+    status('Calibrating camera…');
     webgazer.setGazeListener(onGazeData);
 
     /* Position the webcam preview in the corner */
