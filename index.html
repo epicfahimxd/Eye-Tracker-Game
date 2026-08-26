@@ -61,11 +61,25 @@
   <!-- ═══════════════════ LOADING SCREEN ═══════════════════ -->
   <div id="screen-loading" class="screen">
     <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <h2>Starting Eye Tracker…</h2>
-      <p id="loading-status">Loading face detection model…</p>
-      <p class="loading-sub">This can take 15–30 seconds on first load</p>
-      <button id="btn-loading-cancel" class="btn btn-secondary" style="margin-top:1.5rem">Cancel</button>
+      <!-- Normal loading state -->
+      <div id="loading-spinner-wrap">
+        <div class="loading-spinner"></div>
+        <h2>Starting Eye Tracker…</h2>
+        <p id="loading-status">Loading face detection model…</p>
+        <p class="loading-sub">This can take 15–30 seconds on first load</p>
+        <button id="btn-loading-cancel" class="btn btn-secondary" style="margin-top:1.5rem">Cancel</button>
+      </div>
+      <!-- Error state (hidden until something goes wrong) -->
+      <div id="loading-error-wrap" style="display:none">
+        <div style="font-size:3rem;margin-bottom:0.8rem">⚠️</div>
+        <h2 style="color:#f85149">Eye Tracker Error</h2>
+        <p id="loading-error-msg" class="loading-sub" style="max-width:380px;line-height:1.6;margin-top:0.5rem"></p>
+        <div style="display:flex;gap:0.8rem;margin-top:1.5rem;justify-content:center">
+          <button id="btn-loading-retry" class="btn btn-primary">↺ Try Again</button>
+          <button id="btn-loading-mouse" class="btn btn-secondary">🖱 Mouse Mode</button>
+          <button id="btn-loading-back"  class="btn btn-secondary">← Back</button>
+        </div>
+      </div>
     </div>
   </div>
 

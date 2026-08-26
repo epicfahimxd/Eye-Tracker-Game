@@ -29,30 +29,30 @@ function isSafari() {
 function showEyeTrackerError(err) {
   console.error('[EyeTracker] init failed:', err);
 
+  /* Stay on the loading screen — switch to error state */
+  document.getElementById('loading-spinner-wrap').style.display = 'none';
+  document.getElementById('loading-error-wrap').style.display  = 'block';
+
+  let msg = '';
   if (isSafari()) {
-    alert(
-      '⚠️ Safari is not supported by WebGazer.\n\n' +
-      'Please open this page in Google Chrome:\n' +
-      'http://localhost:8080\n\n' +
-      '(Or click "Use Mouse (Demo Mode)" to play without eye tracking.)'
-    );
-    return;
+    msg = '⚠️ Safari is not supported. Please open http://localhost:8080 in Google Chrome.';
+  } else if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+    msg = 'Camera requires http://localhost. Open the page via the local server, not by double-clicking the file.';
+  } else {
+    msg =
+      'Could not start the camera.\n\n' +
+      '• Make sure you are using Google Chrome\n' +
+      '• Click "Allow" when Chrome asks for camera permission\n' +
+      '• Go to System Settings → Privacy & Security → Camera and enable Chrome\n\n' +
+      (err && err.message ? 'Detail: ' + err.message : '');
   }
+  document.getElementById('loading-error-msg').textContent = msg;
+}
 
-  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
-  if (!isSecure) {
-    alert('Camera access requires http://localhost — open the page via the local server, not by double-clicking the file.');
-    return;
-  }
-
-  alert(
-    'Camera error: ' + (err && err.message ? err.message : String(err)) + '\n\n' +
-    'Try:\n' +
-    '1. Use Google Chrome (not Safari or Firefox)\n' +
-    '2. Refresh and click "Allow" when the browser asks for camera access\n' +
-    '3. Check System Settings → Privacy & Security → Camera → allow Chrome\n' +
-    '4. Or click "Use Mouse (Demo Mode)" to play without eye tracking'
-  );
+function resetLoadingScreen() {
+  document.getElementById('loading-spinner-wrap').style.display = 'block';
+  document.getElementById('loading-error-wrap').style.display   = 'none';
+  setLoadingStatus('Loading face detection model…');
 }
 
 /* ── Boot ───────────────────────────────────────────────── */
@@ -67,31 +67,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ── Welcome screen ─────────────────────────────────────── */
-  document.getElementById('btn-start').addEventListener('click', async () => {
+  async function startEyeTracker() {
+    resetLoadingScreen();
     showScreen('screen-loading');
     setLoadingStatus('Requesting camera access…');
 
     try {
-      /* Give the browser a tick to show the loading screen */
-      await tick();
-
+      await tick(); /* let the browser paint the loading screen first */
       setLoadingStatus('Loading face detection model…');
       await EyeTracker.init(setLoadingStatus);
-
       setLoadingStatus('Eye tracker ready! ✓');
-      await sleep(500);
-
+      await sleep(600);
       showScreen('screen-calibration');
       startCalibration();
     } catch (err) {
-      console.error('Eye tracker init failed:', err);
-      showScreen('screen-welcome');
-      showEyeTrackerError(err);
+      showEyeTrackerError(err); /* stays on loading screen, shows error state */
     }
-  });
+  }
 
-  document.getElementById('btn-loading-cancel').addEventListener('click', () => {
-    showScreen('screen-welcome');
+  document.getElementById('btn-start').addEventListener('click', startEyeTracker);
+
+  /* Loading screen buttons */
+  document.getElementById('btn-loading-cancel').addEventListener('click', () => showScreen('screen-welcome'));
+  document.getElementById('btn-loading-back').addEventListener('click',   () => showScreen('screen-welcome'));
+  document.getElementById('btn-loading-retry').addEventListener('click',  startEyeTracker);
+  document.getElementById('btn-loading-mouse').addEventListener('click',  () => {
+    EyeTracker.enableMouseMode();
+    showScreen('screen-game');
+    Game.startLevel(0);
   });
 
   document.getElementById('btn-mouse-mode').addEventListener('click', () => {
