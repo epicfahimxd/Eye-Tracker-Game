@@ -101,6 +101,14 @@ const EyeTracker = (() => {
     /* Position the webcam preview in the corner */
     setTimeout(styleWebcamPreview, 800);
 
+    /* Hide the face overlay/feedback box — they're debug visuals only */
+    setTimeout(() => {
+      ['webgazerFaceOverlay','webgazerFaceFeedbackBox'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.style.opacity = '0'; el.style.pointerEvents = 'none'; }
+      });
+    }, 1200);
+
     ready = true;
   }
 
