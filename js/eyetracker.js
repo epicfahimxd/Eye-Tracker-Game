@@ -76,6 +76,10 @@ const EyeTracker = (() => {
     const status = typeof onStatus === 'function' ? onStatus : () => {};
 
     webgazer.showPredictionPoints(false);
+    /* Hide the green face-detection overlay box — it's a debug visual
+       that's often misaligned due to video mirroring; doesn't affect accuracy */
+    if (typeof webgazer.showFaceOverlay    === 'function') webgazer.showFaceOverlay(false);
+    if (typeof webgazer.showFaceFeedbackBox === 'function') webgazer.showFaceFeedbackBox(false);
 
     /* Enable WebGazer's built-in Kalman filter for extra smoothing */
     if (typeof webgazer.applyKalmanFilter === 'function') {
