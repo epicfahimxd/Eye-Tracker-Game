@@ -312,9 +312,10 @@ html, body {
   display: block !important;
   border-radius: 0 0 8px 8px !important;
 }
-#webgazerGazeDot        { display: none !important; }
-#webgazerFaceOverlay    { display: none !important; }
-#webgazerFaceFeedbackBox{ display: none !important; }
+#webgazerGazeDot,
+#webgazerFaceOverlay,
+#webgazerFaceFeedbackBox,
+#webgazerVideoContainer canvas { display: none !important; }
 
 /* Drag handle bar */
 #webcam-drag-handle {
